@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logs-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sofka-logs
+  template:
+    metadata:
+      labels:
+        app: sofka-logs
+    spec:
+      containers:
+        - name: sofka-logs
+          image: ldflores/sofka-inventory-logs
+          ports:
+            - containerPort: 8082
+          env:
+            - name: inventory_logs.server.port
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: inventory_logs.server.port
+            - name: rabbit.uri
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: rabbit.uri
+            - name: inventory_logs.mongo.uri
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: inventory_logs.mongo.uri
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  type: NodePort
+  selector:
+    app: sofka-logs
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+      nodePort: 30001
