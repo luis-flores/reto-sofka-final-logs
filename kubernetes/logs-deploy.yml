@@ -38,7 +38,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-service
+  name: logs-service
 spec:
   type: NodePort
   selector:
@@ -47,4 +47,4 @@ spec:
     - protocol: TCP
       port: 8082
       targetPort: 8082
-      nodePort: 30001
+      nodePort: 30081
